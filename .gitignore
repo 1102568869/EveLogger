@@ -1,0 +1,8 @@
+.classpath
+.project
+.idea/
+.settings/
+target/
+logs/
+*.iml
+src/main/resources/application.properties
