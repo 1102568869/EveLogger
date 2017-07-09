@@ -13,7 +13,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import tech.washmore.games.eve.logger.common.ParseEncoding;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -24,7 +27,6 @@ import java.util.Map;
 @Component
 public class LogFileLoaderTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogFileLoaderTask.class);
-    private static final String YST_KEY = new SimpleDateFormat("yyyyMMdd").format(new Date(System.currentTimeMillis() - 24L * 3600 * 1000));
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -37,13 +39,13 @@ public class LogFileLoaderTask {
             throw new IllegalAccessException("请指定需要收集的日志根目录路径!");
         }
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        LOGGER.info("EVE日志开始收集,目标路径:{},当前时间:{},收集日期:{}", path, new Date().toLocaleString(), YST_KEY);
+        LOGGER.info("EVE日志开始收集,目标路径:{},当前时间:{},收集日期:{}", path, new Date().toLocaleString(), getYstKey());
         handle(path);
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 
     private boolean checkHasWrited(String docName) {
-        return mongoTemplate.count(new Query().addCriteria(Criteria.where("logName").regex(YST_KEY)), docName) > 0;
+        return mongoTemplate.count(new Query().addCriteria(Criteria.where("logName").regex(getYstKey())), docName) > 0;
     }
 
     private void handle(String rootPath) throws Exception {
@@ -62,7 +64,7 @@ public class LogFileLoaderTask {
             }
             for (File log : logs) {
                 String fileName = log.getName();
-                if (fileName.contains(YST_KEY)) {
+                if (fileName.contains(getYstKey())) {
                     writeFileToMongo(log);
                 }
             }
@@ -99,5 +101,9 @@ public class LogFileLoaderTask {
             }
             mongoTemplate.save(doc, docName);
         }
+    }
+
+    private String getYstKey() {
+        return new SimpleDateFormat("yyyyMMdd").format(new Date(System.currentTimeMillis() - 24L * 3600 * 1000));
     }
 }
