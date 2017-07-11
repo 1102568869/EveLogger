@@ -108,7 +108,7 @@ public class LogFileLoaderTask {
     }
 
 
-    @Scheduled(cron = "? 22 8 * * ?")
+    @Scheduled(cron = "0 22 8 * * ?")
     public void wakeUp() {
         try {
             Process process = Runtime.getRuntime().exec("E:\\Program Files (x86)\\Tencent\\QQMusic\\QQMusic.exe");
