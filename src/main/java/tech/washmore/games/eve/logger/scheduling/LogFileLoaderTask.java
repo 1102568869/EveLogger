@@ -106,4 +106,20 @@ public class LogFileLoaderTask {
     private String getYstKey() {
         return new SimpleDateFormat("yyyyMMdd").format(new Date(System.currentTimeMillis() - 24L * 3600 * 1000));
     }
+
+
+    @Scheduled(cron = "? 22 8 * * ?")
+    public void wakeUp() {
+        try {
+            Process process = Runtime.getRuntime().exec("E:\\Program Files (x86)\\Tencent\\QQMusic\\QQMusic.exe");
+            LOGGER.info("程序开始启动:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "GBK"));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                LOGGER.info(line);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 }
